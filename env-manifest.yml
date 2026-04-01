@@ -1,0 +1,46 @@
+version: "1.0"
+agent_id: "slack-morning-greeter"
+agent_name: "Slack Morning Greeter"
+
+categories:
+  - category: "channel"
+    label: "Channels"
+    groups:
+      - name: "Slack"
+        icon: "💬"
+        description: "Slack workspace for morning greeting delivery"
+        vars:
+          - key: SLACK_BOT_TOKEN
+            label: "Bot Token"
+            required: true
+            secret: true
+            help: "Create a bot at https://api.slack.com/apps and get the bot token"
+          - key: SLACK_CHANNEL
+            label: "Channel"
+            required: true
+            secret: false
+            placeholder: "#general or channel ID"
+
+  - category: "infrastructure"
+    label: "Infrastructure"
+    groups:
+      - name: "Database"
+        icon: "🗄️"
+        description: "PostgreSQL for greeting history tracking (optional — agent works without it)"
+        vars:
+          - key: PG_CONNECTION_STRING
+            label: "Connection String"
+            required: false
+            secret: true
+            placeholder: "postgresql://user:pass@host:5432/dbname"
+          - key: ORG_ID
+            label: "Organisation ID"
+            required: false
+            secret: false
+            default: "default"
+          - key: AGENT_ID
+            label: "Agent ID"
+            required: false
+            secret: false
+            auto_fill: true
+            default: "slack-morning-greeter"
