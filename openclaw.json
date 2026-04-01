@@ -1,22 +1,21 @@
 {
   "name": "slack-morning-greeter",
   "version": "1.0.0",
-  "description": "Automated morning greeting sent to Slack every weekday at 10 AM IST",
+  "description": "Daily morning greeting sent via Slack DM at 10:00 AM UTC",
   "agent_metadata": {
     "agent_name": "Slack Morning Greeter",
     "agent_id": "slack-morning-greeter",
     "avatar": "☀️",
-    "tone": "Warm and friendly",
+    "tone": "Friendly and warm",
     "domain": "Team Communication & Productivity",
-    "primary_users": "Team members",
-    "automation_type": "scheduled_notification",
-    "schedule_description": "Weekdays (Mon-Fri) at 10:00 AM IST",
-    "cron_expression": "30 4 * * 1-5"
+    "primary_users": "Team members receiving daily greetings",
+    "automation_type": "notification",
+    "schedule_description": "Daily at 10:00 AM UTC",
+    "cron_expression": "0 10 * * *"
   },
   "skills": [
     "data-writer",
-    "greeting-composer",
-    "log-writer",
+    "greeting-sender",
     "result-query"
   ],
   "workflows": {
@@ -26,7 +25,14 @@
     "morning-greeting": "cron/morning-greeting.json"
   },
   "env": {
-    "required": ["SLACK_BOT_TOKEN", "SLACK_CHANNEL"],
-    "optional": ["PG_CONNECTION_STRING", "ORG_ID", "AGENT_ID"]
+    "required": [
+      "SLACK_BOT_TOKEN",
+      "SLACK_USER_ID"
+    ],
+    "optional": [
+      "PG_CONNECTION_STRING",
+      "ORG_ID",
+      "AGENT_ID"
+    ]
   }
 }

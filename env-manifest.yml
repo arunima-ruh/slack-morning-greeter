@@ -14,19 +14,21 @@ categories:
             label: "Bot Token"
             required: true
             secret: true
-            help: "Create a bot at https://api.slack.com/apps and get the bot token"
-          - key: SLACK_CHANNEL
-            label: "Channel"
+            help: "Create a Slack bot at https://api.slack.com/apps and install to workspace"
+            placeholder: "xoxb-..."
+          - key: SLACK_USER_ID
+            label: "User ID"
             required: true
             secret: false
-            placeholder: "#general or channel ID"
+            help: "Find user ID by clicking user profile in Slack (e.g., U01234567)"
+            placeholder: "U01234567"
 
   - category: "infrastructure"
     label: "Infrastructure"
     groups:
       - name: "Database"
         icon: "🗄️"
-        description: "PostgreSQL for greeting history tracking (optional — agent works without it)"
+        description: "PostgreSQL for result storage (optional — agent works without it)"
         vars:
           - key: PG_CONNECTION_STRING
             label: "Connection String"

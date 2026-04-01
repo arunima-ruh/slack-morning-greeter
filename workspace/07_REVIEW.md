@@ -7,10 +7,10 @@
 | **Name**           | ☀️ Slack Morning Greeter       |
 | **ID**             | `slack-morning-greeter`        |
 | **Version**        | 1.0.0                          |
-| **Scope**          | Automated morning greeting sent to Slack every weekday at 10 AM IST |
-| **Tone**           | Warm and friendly              |
-| **Model**          | Default (inherited from org)   |
-| **Token Budget**   | Default (inherited from org)   |
+| **Scope**          | Daily morning greeting delivery via Slack DM |
+| **Tone**           | Friendly and warm              |
+| **Model**          | openrouter/anthropic/claude-sonnet-4.5 |
+| **Token Budget**   | 50,000 per conversation        |
 
 ---
 
@@ -18,9 +18,9 @@
 
 | Type               | Count                    |
 |--------------------|--------------------------|
-| Custom Rules       | 8                        |
+| Custom Rules       | 5                        |
 | Inherited Org Rules| 0                        |
-| **Total**          | **8**                    |
+| **Total**          | **5**                    |
 
 ---
 
@@ -28,17 +28,15 @@
 
 | Skill                     | Mode         |
 |---------------------------|--------------|
-| data-writer               | 🟢 Auto      |
-| greeting-composer         | 🟢 Auto      |
-| slack-sender              | 🟢 Auto      |
-| log-writer                | 🟢 Auto      |
-| result-query              | 🟢 Auto      |
+| Data Writer               | 🟢 Auto      |
+| Greeting Sender           | 🟢 Auto      |
+| Result Query              | 🟢 Auto      |
 
 | Mode     | Count              |
 |----------|--------------------|
 | 🔴 HiTL | 0                  |
-| 🟢 Auto | 5                  |
-| **Total**| **5**              |
+| 🟢 Auto | 3                  |
+| **Total**| **3**              |
 
 ---
 
@@ -46,8 +44,8 @@
 
 | Trigger                    | Type       | Schedule              |
 |----------------------------|------------|-----------------------|
-| On User Message            | Conversational | Always active      |
-| Morning Greeting           | Scheduled  | Weekdays 10:00 AM IST (Cron: 30 4 * * 1-5) |
+| Conversational             | On-demand  | Always active         |
+| Morning Greeting           | Scheduled  | Daily at 10:00 AM UTC |
 
 ---
 
@@ -55,10 +53,10 @@
 
 | Field                  | Value                          |
 |------------------------|--------------------------------|
-| **Teams**              | Engineering (full access)      |
-| **Approver (default)** | Not applicable (no HiTL steps) |
-| **Approver (elevated)**| Not applicable                 |
-| **Approval SLA**       | Not applicable                 |
+| **Teams**              | Everyone                       |
+| **Approver (default)** | None (fully automated)         |
+| **Approver (elevated)**| None (fully automated)         |
+| **Approval SLA**       | N/A                            |
 
 ---
 
@@ -67,18 +65,21 @@
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                                                             │
-│  ✅ No Human-in-the-Loop steps — fully automated            │
+│  ✅ This agent is fully automated (no HiTL approvals)       │
 │                                                             │
-│  ✅ No webhook endpoints — cron-triggered only              │
+│  ⚠️  Required Environment Variables:                        │
 │                                                             │
-│  ⚠️  Database is optional but recommended                   │
-│     • Without PG_CONNECTION_STRING, greeting history        │
-│       will NOT be tracked                                   │
-│     • Agent will still send greetings successfully          │
+│     • SLACK_BOT_TOKEN  → Slack bot token (xoxb-)           │
+│     • SLACK_USER_ID    → Target user ID (U...)             │
 │                                                             │
-│  ⚠️  Slack token required                                   │
-│     • SLACK_BOT_TOKEN must be set in .env                   │
-│     • Get token from https://api.slack.com/apps             │
+│  ⚠️  Optional Environment Variables:                        │
+│                                                             │
+│     • PG_CONNECTION_STRING → PostgreSQL (for tracking)     │
+│     • ORG_ID               → Organisation ID               │
+│     • AGENT_ID             → Agent identifier              │
+│                                                             │
+│  ℹ️  Note: Agent works without database, but won't track   │
+│     delivery history or answer user queries about data.    │
 │                                                             │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -87,44 +88,61 @@
 
 ## Post-Deployment Checklist
 
-**Before first run:**
+### Phase 1: Environment Setup
 
-- [ ] Copy `.env.example` to `.env`
-- [ ] Set `SLACK_BOT_TOKEN` (from Slack app settings)
-- [ ] Set `SLACK_CHANNEL` (channel name or ID)
-- [ ] (Optional) Set `PG_CONNECTION_STRING` for greeting history tracking
-- [ ] Run `./install-dependencies.sh` to install system packages
-- [ ] Run `./check-environment.sh` to validate setup
-- [ ] Run `python3 scripts/data_writer.py provision` if using database
+- [ ] Create Slack bot at https://api.slack.com/apps
+- [ ] Install bot to workspace and get token (xoxb-...)
+- [ ] Get target user ID from Slack profile
+- [ ] Set up PostgreSQL database (optional)
+- [ ] Copy `.env.example` to `.env` and fill in credentials
+- [ ] Run `./check-environment.sh` to verify setup
 
-**After deployment:**
+### Phase 2: Installation
 
-- [ ] Test workflow: `openclaw workflow run workflows/main.yaml`
-- [ ] Verify greeting sent to Slack channel
-- [ ] Check logs for any errors
-- [ ] (If using DB) Query result_greeting_log to verify logging
+- [ ] Clone the repository
+- [ ] Run `./install-dependencies.sh` to install Python packages
+- [ ] Test workflow with `./test-workflow.sh`
+- [ ] Verify database schema created (if using PostgreSQL)
 
-**Monitoring:**
+### Phase 3: Deployment
 
-- [ ] Check cron logs for scheduled runs
-- [ ] Monitor Slack API rate limits (standard tier)
-- [ ] Review result_greeting_log periodically for failed deliveries
+- [ ] Deploy to OpenClaw instance
+- [ ] Enable the morning-greeting cron job
+- [ ] Verify first greeting sends successfully
+- [ ] Test conversational queries ("Did the greeting send today?")
 
----
+### Phase 4: Monitoring
 
-## Known Limitations
-
-1. **Single channel only** — Agent sends to one Slack channel (configured via SLACK_CHANNEL env var)
-2. **Static message** — Greeting text is hardcoded in greeting-composer/scripts/run.sh
-3. **No dynamic content** — Does not include weather, quotes, news, or other external data
-4. **Weekdays only** — Saturday and Sunday greetings require manual cron schedule change
-5. **No chat-triggered sends** — Users cannot request a greeting via chat (cron-triggered only)
+- [ ] Check cron logs daily for first week
+- [ ] Verify delivery history is being tracked
+- [ ] Confirm Slack DM delivery is working
+- [ ] Set up alerts for failed deliveries (optional)
 
 ---
 
-## Support
+## Next Steps After Deployment
 
-For issues or questions:
-- Check README.md in the repository
-- Review OpenClaw docs: https://docs.openclaw.ai
-- Join OpenClaw community: https://discord.com/invite/clawd
+1. **Test manually**: Run `./test-workflow.sh` to verify everything works
+2. **Wait for cron**: First greeting will send tomorrow at 10:00 AM UTC
+3. **Query history**: Ask the agent "Show recent greetings" after first run
+4. **Monitor logs**: Check OpenClaw logs for any errors
+
+---
+
+## Support & Troubleshooting
+
+**Common Issues:**
+
+| Issue | Solution |
+|-------|----------|
+| Greeting not sending | Check SLACK_BOT_TOKEN is valid and bot is installed to workspace |
+| User not receiving | Verify SLACK_USER_ID is correct (starts with U) |
+| Database errors | Check PG_CONNECTION_STRING format and database is reachable |
+| Cron not running | Verify cron job is enabled in OpenClaw config |
+
+**Getting Help:**
+
+- Check README.md for detailed setup instructions
+- Review workspace/SOUL.md for agent behavior rules
+- Inspect logs in OpenClaw dashboard
+- Query delivery history: "Show recent greetings"

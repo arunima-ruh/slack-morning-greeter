@@ -1,8 +1,29 @@
+# Environment
 .env
-*.pyc
+.env.local
+
+# Python
 __pycache__/
-.venv/
+*.py[cod]
+*$py.class
+*.so
+.Python
 venv/
+ENV/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
 *.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
 /tmp/
-output/
+*.tmp

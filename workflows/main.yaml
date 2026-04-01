@@ -1,34 +1,37 @@
-name: slack-morning-greeter-workflow
-description: "Send a simple good morning greeting to Slack every weekday at 10 AM IST"
-version: "1.0.0"
+name: "slack-morning-greeter-workflow"
+version: "1.0"
+description: "Daily morning greeting via Slack DM at 10:00 AM UTC"
 
 steps:
-  - id: provision-db
+  - id: provision-schema
     type: skill
     skill: data-writer
-    description: "Provision database schema (first run only)"
-    command: "python3 scripts/data_writer.py provision"
-    on_error: continue
+    description: "Create database schema and tables (first run only)"
+    action: provision
 
-  - id: compose-greeting
-    type: skill
-    skill: greeting-composer
-    description: "Generate morning greeting message"
-    depends_on: []
-
-  - id: send-to-slack
-    type: native_tool
+  - id: send-greeting
+    type: native-tool
     tool: message
-    description: "Send greeting via Slack"
-    depends_on: [compose-greeting]
+    description: "Send morning greeting via Slack DM"
+    depends_on:
+      - provision-schema
     params:
       action: "send"
       channel: "slack"
-      target: "${SLACK_CHANNEL}"
-      message_file: "/tmp/greeting-composer_${RUN_ID}.json"
+      target: "${SLACK_USER_ID}"
+      message: "Good morning openclaw"
 
-  - id: write-log
+  - id: record-delivery
     type: skill
-    skill: log-writer
-    description: "Record delivery status to database"
-    depends_on: [send-to-slack]
+    skill: greeting-sender
+    description: "Record delivery in database"
+    depends_on:
+      - send-greeting
+
+  - id: write-results
+    type: skill
+    skill: data-writer
+    description: "Finalize database writes"
+    depends_on:
+      - record-delivery
+    action: query

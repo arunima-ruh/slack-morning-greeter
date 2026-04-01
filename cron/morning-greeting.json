@@ -1,8 +1,8 @@
 {
   "name": "morning-greeting",
-  "description": "Send morning greeting to Slack every weekday at 10 AM IST",
-  "schedule": "30 4 * * 1-5",
-  "timezone": "Asia/Kolkata",
-  "workflow": "workflows/main.yaml",
-  "enabled": true
+  "description": "Send morning greeting via Slack at 10:00 AM UTC",
+  "schedule": "0 10 * * *",
+  "workflow": "main",
+  "enabled": true,
+  "timezone": "UTC"
 }

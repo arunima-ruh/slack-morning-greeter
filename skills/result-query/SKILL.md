@@ -1,7 +1,7 @@
 ---
 name: result-query
 version: 1.0.0
-description: "Query your agent's stored greeting history. Use when the user asks about past greetings, delivery status, or message history."
+description: "Query your agent's stored results. Use when the user asks about data, metrics, delivery history, or any stored information."
 user-invocable: true
 metadata:
   openclaw:
@@ -12,23 +12,22 @@ metadata:
 
 # Result Query
 
-Answer user questions about stored greeting data by querying result tables via `scripts/data_writer.py query`.
+Answer user questions about stored data by querying result tables via `scripts/data_writer.py query`.
 
 ## Available Tables
 
-### result_greeting_log
+### result_greeting_deliveries
 | Column | Type | Description |
 |---|---|---|
-| date_key | string | Date in YYYY-MM-DD format |
-| channel | string | Slack channel name or ID |
-| message_content | text | The greeting message that was sent |
-| sent_at | datetime | Exact timestamp when message was sent |
-| status | string | Delivery status: sent, failed, skipped |
+| date_key | string | Date of the greeting (YYYY-MM-DD) |
+| sent_at | datetime | Exact timestamp when greeting was sent |
+| message_text | text | The greeting message that was sent |
+| delivery_status | string | Success or error status |
 
 **Query examples:**
-- All records: `--table result_greeting_log --limit 10`
-- Filtered by date: `--table result_greeting_log --where '{"date_key": "2026-04-01"}'`
-- Sorted by date: `--table result_greeting_log --order-by "sent_at DESC" --limit 5`
+- All records: `--table result_greeting_deliveries --limit 10`
+- Filtered: `--table result_greeting_deliveries --where '{"date_key": "2026-04-01"}'`
+- Sorted: `--table result_greeting_deliveries --order-by "sent_at DESC" --limit 5`
 
 ## How to Query
 
@@ -44,10 +43,10 @@ python3 ${PROJECT_ROOT}/scripts/data_writer.py query \
 
 | User asks | Query |
 |---|---|
-| "Show my recent greetings" | --table result_greeting_log --order-by "sent_at DESC" --limit 5 |
-| "Did the greeting send today?" | --table result_greeting_log --where '{"date_key": "2026-04-01"}' |
-| "Show failed deliveries" | --table result_greeting_log --where '{"status": "failed"}' |
-| "What was yesterday's message?" | --table result_greeting_log --order-by "sent_at DESC" --limit 1 --offset 1 |
+| "Show recent greetings" | --table result_greeting_deliveries --order-by "sent_at DESC" --limit 5 |
+| "Did the greeting send today?" | --table result_greeting_deliveries --where '{"date_key": "2026-04-01"}' |
+| "Show all greeting history" | --table result_greeting_deliveries --order-by "sent_at DESC" --limit 20 |
+| "When was the last greeting sent?" | --table result_greeting_deliveries --order-by "sent_at DESC" --limit 1 |
 
 ## Rules
 

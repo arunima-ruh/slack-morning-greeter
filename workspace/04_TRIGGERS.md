@@ -2,51 +2,48 @@
 
 ## Active Triggers
 
-### T1 — On User Message (Always On)
+### conversational — On User Message (Always On)
 
 | Field       | Value                              |
 |-------------|------------------------------------|
 | **Type**    | Conversational                     |
 | **Status**  | ✅ Always On                       |
-| **Channel** | Webchat, configured channels       |
+| **Channel** | Any (Slack, Telegram, Web UI)      |
 
 **Sample User Queries This Trigger Handles:**
 
-- "Show my recent greetings"
 - "Did the greeting send today?"
-- "Show failed deliveries"
-- "What was yesterday's message?"
-- "Show greeting history for the past week"
-
-**Note:** This agent does NOT execute workflow steps in response to chat messages. It only queries and displays stored data. Workflow execution is cron-triggered only.
+- "Show recent greetings"
+- "When was the last greeting sent?"
+- "Show greeting history"
+- "What data do you track?"
 
 ---
 
-### T2 — Scheduled: Morning Greeting
+### morning-greeting — Scheduled: Daily Morning Greeting
 
 | Field           | Value                              |
 |-----------------|------------------------------------|
 | **Type**        | Scheduled                          |
 | **Status**      | ✅ Active                          |
-| **Frequency**   | Weekdays only (Mon-Fri)            |
-| **Time**        | 10:00 AM IST (04:30 UTC)           |
-| **Cron**        | `30 4 * * 1-5`                     |
+| **Frequency**   | Daily                              |
+| **Time**        | 10:00 AM UTC                       |
+| **Cron**        | `0 10 * * *`                       |
 
 **What It Does:**
 
-- Generates a simple "Good morning! ☀️" message
-- Sends the message to the configured Slack channel using the native message() tool
-- Logs the delivery status (sent/failed) to the database
-
-**Important:** This trigger is the ONLY way the workflow executes. Users cannot trigger greetings via chat.
+- Sends "Good morning openclaw" via Slack DM
+- Records delivery timestamp in database
+- Updates delivery status (success/error)
 
 ---
 
 ## Trigger Summary
 
-| Trigger Type        | Count | Trigger IDs |
-|---------------------|-------|-------------|
-| Conversational      | 1     | T1          |
-| Scheduled           | 1     | T2          |
-| Heartbeat           | 0     | None        |
-| Webhook             | 0     | None        |
+| Trigger Type    | Count | Status  |
+|-----------------|-------|---------|
+| Conversational  | 1     | ✅ On   |
+| Scheduled       | 1     | ✅ On   |
+| Heartbeat       | 0     | N/A     |
+| Webhook         | 0     | N/A     |
+| **Total**       | **2** | **Active** |

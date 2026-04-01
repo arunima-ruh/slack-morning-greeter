@@ -4,57 +4,52 @@
 
 | Field              | Value                          |
 |--------------------|--------------------------------|
-| **Access Type**    | Team-wide                      |
+| **Access Type**    | Open (no restrictions)         |
 
 ### Authorized Teams
 
 | Team               | Access Level | Members (approx) |
 |--------------------|-------------|-------------------|
-| Engineering        | Full        | TBD               |
+| Everyone           | Full        | All              |
 
 ### Restricted From
 
-No restrictions — agent is accessible to all team members with OpenClaw access.
+None — this is a simple notification bot with no sensitive operations
 
 ---
 
 ## HiTL Approvers
 
-This agent has no human-in-the-loop approval steps. All workflow execution is fully automated.
+None — all operations are fully automated
 
 ---
 
 ## Model Configuration
 
-| Field                | Value                          |
-|----------------------|--------------------------------|
-| **Primary Model**    | Default (inherited from org)   |
-| **Fallback Model**   | Not configured                 |
-| **Token Budget**     | Not specified (use org default)|
+| Field                        | Value                          |
+|------------------------------|--------------------------------|
+| **Default Model**            | openrouter/anthropic/claude-sonnet-4.5 |
+| **Reasoning Mode**           | Off                            |
+| **Token Budget per Session** | 50,000                         |
+| **Budget Reset**             | Per conversation               |
 
 ---
 
-## External API Access
+## Rate Limits
 
-| API / Service      | Purpose                | Auth Method           | Rate Limit       |
-|--------------------|------------------------|-----------------------|------------------|
-| Slack              | Message delivery       | Bot token             | Standard tier    |
-| PostgreSQL         | Greeting history       | Connection string     | No limit         |
-
----
-
-## Data Access Scope
-
-| Data Source        | Access Level           | Notes                          |
-|--------------------|------------------------|--------------------------------|
-| result_greeting_log | Read/Write (own schema)| Agent can query and write logs |
-| Other schemas      | No access              | Blocked at database level      |
+| Field                      | Value                          |
+|----------------------------|--------------------------------|
+| **Max Queries per Hour**   | Unlimited                      |
+| **Max Concurrent Sessions**| 1 (cron-triggered only)        |
 
 ---
 
-## Security Notes
+## Permission Matrix
 
-- **Database safety:** All operations via scripts/data_writer.py — no raw SQL, no DROP/DELETE/TRUNCATE
-- **Slack token:** Store SLACK_BOT_TOKEN in .env, never commit to git
-- **Read-only queries:** Users can query greeting history but cannot delete records
-- **No external webhooks:** Agent does not expose any inbound webhook endpoints
+| Permission                | Granted |
+|---------------------------|---------|
+| Read delivery history     | ✅ Yes  |
+| Send greeting (manual)    | ✅ Yes  |
+| Modify greeting message   | ❌ No   |
+| Access other agents' data | ❌ No   |
+| Modify database schema    | ❌ No   |

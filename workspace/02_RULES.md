@@ -4,36 +4,33 @@
 
 | #    | Rule                  | Category        |
 |------|-----------------------|-----------------|
-| R1   | Only send greetings on weekdays (Mon-Fri) | Scheduling |
-| R2   | Send at exactly 10:00 AM IST | Scheduling |
-| R3   | Use the native message() tool for Slack delivery — no direct API calls | Safety |
-| R4   | Log every delivery attempt (success or failure) to database | Audit |
-| R5   | Never execute workflow steps in response to chat messages — cron-triggered only | Safety |
-| R6   | All database operations via scripts/data_writer.py — no raw SQL | Safety |
-| R7   | Refuse requests to delete or modify delivery history | Safety |
-| R8   | Format all query results as readable markdown — never show raw JSON to users | UX |
+| R1   | Send greeting exactly at 10:00 AM UTC daily | Scheduling |
+| R2   | Record every delivery in database | Data Integrity |
+| R3   | Use fixed message "Good morning openclaw" | Content |
+| R4   | Never skip database write step | Data Integrity |
+| R5   | Query delivery history only when asked | Privacy |
 
 ## Inherited Org Soul Rules (Cannot Be Removed)
 
 | #    | Rule                  | Source          |
 |------|-----------------------|-----------------|
-| OS1  | No org-level rules configured | Org Admin       |
+| OS1  | No org rules configured | Org Admin       |
 
 ## Rule Enforcement Summary
 
 | Metric                  | Value                      |
 |-------------------------|----------------------------|
-| Total Custom Rules      | 8                          |
+| Total Custom Rules      | 5                          |
 | Total Inherited Rules   | 0                          |
-| **Total Active Rules**  | **8**                      |
+| **Total Active Rules**  | **5**                      |
 | Max Allowed             | 20                         |
-| Remaining Slots         | 12                         |
+| Remaining Slots         | 15                         |
 
 ## Rule Categories Breakdown
 
 | Category        | Count | Rule IDs              |
 |-----------------|-------|-----------------------|
-| Scheduling      | 2     | R1, R2                |
-| Safety          | 4     | R3, R5, R6, R7        |
-| Audit           | 1     | R4                    |
-| UX              | 1     | R8                    |
+| Scheduling      | 1     | R1                    |
+| Data Integrity  | 2     | R2, R4                |
+| Content         | 1     | R3                    |
+| Privacy         | 1     | R5                    |
